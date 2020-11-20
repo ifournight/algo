@@ -19,8 +19,8 @@ class ArrayQueue(object):
         print('Queue is full, enqueue failed.')
         return False
       else:
-        self.array = self.array[self.head:self.tail]
-        self.tail = self.tail - self.head
+        self.array[0 : self.tail - self.head] = self.array[self.head : self.tail]
+        self.tail -= self.head
         self.head = 0
     self.array.append(item)
     self.tail += 1
