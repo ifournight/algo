@@ -22,7 +22,7 @@ def partition(array, low, high)
   j = low
   r = high
   pivot = array[r]
-  while j <= r
+  while j < r
     if array[j] < pivot
       array[i], array[j] = array[j], array[i]
       i += 1
@@ -35,5 +35,5 @@ end
 
 array = [4, 5, 6, 1, 2, 3]
 puts(array.join(','))
-item = find_kth_largest(array, 6)
+item = find_kth_largest(array, 3)
 puts(item)

@@ -5,7 +5,7 @@ def quick_sort(array)
 end
 
 def quick_sort_recurrsion(array, lower, upper)
-  return if lower > upper
+  return if lower >= upper
 
   middle = partition(array, lower, upper)
   quick_sort_recurrsion(array, lower, middle - 1)
@@ -27,6 +27,6 @@ def partition(array, lower, upper)
 end
 
 array = []
-100_000.times { array << rand(1_000_000) }
+10.times { array << rand(100) }
 quick_sort(array)
-puts(array)
+puts(array.join(','))
