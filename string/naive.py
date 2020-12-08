@@ -9,26 +9,25 @@ def naive_string_match(main_str, pattern):
     return matches
 
 
-# TODO: buggy
 def less_naive_string_match(main_str, pattern):
     """sligtly less naive way to implement string match"""
     # Generate characters set of pattern string
-    pattern_set = set([char for char in pattern])
     matches = []
+    pattern_set = set([char for char in pattern])
     i = 0
     while i <= len(main_str) - len(pattern):
         j = 0
-        while j < len(pattern):
-            # If mismatch happen, and mismatched character in main str does
-            # not occur in pattern str, skip to position after mismatched index
-            if main_str[i + j] != pattern[j] and main_str[i + j] not in pattern_set:
-                break
+        while j < len(pattern) and main_str[i + j] == pattern[j]:
             j += 1
         if j == len(pattern):
             matches.append(i)
             i += 1
-        else:
+        # If mismatch happen, and mismatched character in main str does
+        # not occur in pattern str, skip to position after mismatched index
+        elif main_str[i + j] not in pattern_set:
             i += j + 1
+        else:
+            i += 1
     return matches
 
 
@@ -42,7 +41,7 @@ if __name__ == "__main__":
             "find {pattern} in {main_str} at index {indices}".format(
                 pattern=pattern,
                 main_str=main_str,
-                indices=naive_string_match(main_str, pattern),
+                indices=less_naive_string_match(main_str, pattern),
             )
         )
 
@@ -54,7 +53,7 @@ if __name__ == "__main__":
             "find {pattern} in {main_str} at index {indices}".format(
                 pattern=pattern,
                 main_str=main_str,
-                indices=naive_string_match(main_str, pattern),
+                indices=less_naive_string_match(main_str, pattern),
             )
         )
 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
             "find {pattern} in {main_str} at index {indices}".format(
                 pattern=pattern,
                 main_str=main_str,
-                indices=naive_string_match(main_str, pattern),
+                indices=less_naive_string_match(main_str, pattern),
             )
         )
 
@@ -78,16 +77,17 @@ if __name__ == "__main__":
             "find {pattern} in {main_str} at index {indices}".format(
                 pattern=pattern,
                 main_str=main_str,
-                indices=naive_string_match(main_str, pattern),
+                indices=less_naive_string_match(main_str, pattern),
             )
         )
 
     def test_shakespeare():
         print("test word against shakespeare complete")
-        pattern = """Thy bosom is endeared with all hearts"""
+        # pattern = """Thy bosom is endeared with all hearts"""
+        pattern = "tomorrow"
         testpath = "./data/100.txt"
         shakespeare = open(testpath).read()
-        matches = naive_string_match(shakespeare, pattern)
+        matches = less_naive_string_match(shakespeare, pattern)
         print(
             "find {pattern} in shakespeare complete {match_time} times".format(
                 pattern=pattern, match_time=len(matches)
