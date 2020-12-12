@@ -239,6 +239,26 @@ class BST
     postorder.reverse
   end
 
+  # 返回在指定[start_key, end_key](包含start_key, end_key)之间的结点
+  def list_between(start_key, end_key)
+    list = []
+    list_between_recur(@root, start_key, end_key, list)
+    list
+  end
+
+  def list_between_recur(node, start_key, end_key, list = [])
+    return if node.nil?
+
+    if node.key >= start_key
+      list_between_recur(node.left, start_key, end_key, list)
+    end
+    list << node if (start_key..end_key).include?(node.key)
+    if node.key <= end_key
+      list_between_recur(node.right, start_key, end_key, list)
+    end
+  end
+  private_methods :list_between_recur
+
   private
 
   # 从指定节点开始找最小值
@@ -354,6 +374,11 @@ bst = BST.new
 [33, 16, 13, 15, 18, 50, 25, 17, 27, 19, 58, 34, 51, 55, 66].each { |num| bst.insert(key: num, value: num) }
 puts "bst height #{bst.height}"
 puts bst.to_str
+start_key = 15
+end_key = 34
+puts "bst list between #{start_key} and #{end_key}"
+list = bst.list_between(start_key, end_key)
+puts list.map(&:to_str)
 puts '---------'
 bst.delete(13)
 puts 'delete 13'
