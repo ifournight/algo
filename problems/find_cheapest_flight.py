@@ -31,6 +31,9 @@
 
 # 从城市 0 到城市 2 在 0 站中转以内的最便宜价格是 500，如图中蓝色所示。
 
+import unittest
+
+
 class Solution(object):
     def findCheapestPrice(self, n, flights, src, dst, K):
         """
@@ -41,80 +44,83 @@ class Solution(object):
         :type K: int
         :rtype: int
         """
-        inf = float('inf')
         cheaptest = -1
         flight_table = {}
-        cities = range(0, n)
         for flight in flights:
             from_city, _, _ = flight
             if from_city in flight_table:
                 flight_table[from_city].append(flight)
             else:
                 flight_table[from_city] = [flight]
-        heap = []
-        heap = [(0 if city == src else inf, city, -1) for city in cities]
         import heapq
-        heapq.heapify(heap)
-        visited = set()
+        heap = [(0, None, src, -1)]
+        flight_path_table = {}
+        path = []
         while heap:
-            price1, city1, transfer = heapq.heappop(heap)
-            if price1 == inf:
-                break
-            if (city1, transfer) in visited:
+            price1, city1, city2, transfer = heapq.heappop(heap)
+            if (city2, transfer) in flight_path_table:
                 continue
-            if transfer < K:
-                for flight in flight_table.get(city1, []):
-                    _, city2, price2 = flight
-                    heapq.heappush(
-                        heap, (price1 + price2, city2, transfer + 1))
-            visited.add((city1, transfer))
-            if city1 == dst:
+            if city2 not in flight_path_table and transfer <= K:
+                flight_path_table[(city2, transfer)] = city1
+            if city2 == dst:
                 cheaptest = price1
+                # 从 from city table 组装出航班路线
+                curr_city = dst
+                curr_transfer = transfer
+                while curr_city is not None:
+                    path.append(curr_city)
+                    curr_city = flight_path_table.get(
+                        (curr_city, curr_transfer), None)
+                    curr_transfer -= 1
+                path.reverse()
                 break
-        return cheaptest
+            if transfer < K:
+                for flight in flight_table.get(city2, []):
+                    _, city3, price2 = flight
+                    heapq.heappush(
+                        heap, (price1 + price2, city2, city3, transfer + 1))
+
+        return cheaptest, path
+
+
+class TestCheapestFlight(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test1(self):
+        n = 3
+        flights = [[0, 1, 100], [1, 2, 100], [0, 2, 500]]
+        src = 0
+        dst = 2
+        k = 1
+        price, path = Solution().findCheapestPrice(n, flights, src, dst, k)
+        self.assertEqual(price, 200)
+        self.assertEqual(path, [0, 1, 2])
+
+    def test3(self):
+        n = 4
+        flights = [[0, 1, 1], [0, 2, 5], [1, 2, 1], [2, 3, 1]]
+        src = 0
+        dst = 3
+        k = 1
+        price, path = Solution().findCheapestPrice(n, flights, src, dst, k)
+        self.assertEqual(price, 6)
+        self.assertEqual(path, [0, 2, 3])
+
+    def test2(self):
+        n = 5
+        flights = [[4, 1, 1], [1, 2, 3], [0, 3, 2],
+                   [0, 4, 10], [3, 1, 1], [1, 4, 3]]
+        src = 2
+        dst = 1
+        k = 1
+        price, path = Solution().findCheapestPrice(n, flights, src, dst, k)
+        self.assertEqual(price, -1)
+        self.assertEqual(path, [])
 
 
 if __name__ == '__main__':
-    # n = 3
-    # flights = [[0, 1, 100], [1, 2, 100], [0, 2, 500]]
-    # src = 0
-    # dst = 2
-    # k = 1
-    # price = Solution().findCheapestPrice(n, flights, src, dst, k)
-    # print("Given flights {flights}, with at most {k} transfer, the cheapest price from city {src} to {dst} is {price}".format(
-    #     flights=flights,
-    #     k=k,
-    #     src=src,
-    #     dst=dst,
-    #     price=price
-    # ))
-
-    # n = 5
-    # flights = [[4,1,1],[1,2,3],[0,3,2],[0,4,10],[3,1,1],[1,4,3]]
-    # src = 2
-    # dst = 1
-    # k = 1
-    # price = Solution().findCheapestPrice(n, flights, src, dst, k)
-    # print("Given flights {flights}, with at most {k} transfer, the cheapest price from city {src} to {dst} is {price}".format(
-    #     flights=flights,
-    #     k=k,
-    #     src=src,
-    #     dst=dst,
-    #     price=price
-    # ))
-
-    n = 4
-    flights = [[0,1,1],[0,2,5],[1,2,1],[2,3,1]]
-    src = 0
-    dst = 3
-    k = 1
-    price = Solution().findCheapestPrice(n, flights, src, dst, k)
-    print("Given flights {flights}, with at most {k} transfer, the cheapest price from city {src} to {dst} is {price}".format(
-        flights=flights,
-        k=k,
-        src=src,
-        dst=dst,
-        price=price
-    ))
-
-
+    unittest.main()
